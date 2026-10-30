@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #20302e;
+            --muted: #64736f;
+            --line: #dce5e1;
+            --surface: #ffffff;
+            --page: #f2f6f3;
+            --accent: #176b5b;
+            --accent-hover: #105447;
+            --danger: #a33c36;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background: var(--page);
+            color: var(--ink);
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .contenedor {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 26px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgb(32 48 46 / 6%);
+        }
+
+        .barra-superior {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+
+        .tabla-contenedor { overflow-x: auto; }
+
+        .fila-clientes {
+            display: grid;
+            grid-template-columns: 0.55fr 1.15fr 1fr 1fr 1fr 0.8fr 1.55fr;
+            align-items: center;
+            min-width: 900px;
+        }
+
+        .cabecera {
+            padding: 12px 10px;
+            border-bottom: 2px solid var(--line);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .cliente {
+            min-height: 52px;
+            border-bottom: 1px solid var(--line);
+            transition: background-color 140ms ease;
+        }
+
+        .cliente:hover { background: #f5faf7; }
+
+        .celda {
+            min-width: 0;
+            padding: 12px 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .acciones form { margin: 0; }
+
+        .boton {
+            min-height: 34px;
+            padding: 7px 12px;
+            border: 1px solid var(--accent);
+            border-radius: 5px;
+            background: var(--accent);
+            color: white;
+            font: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .boton:hover { background: var(--accent-hover); }
+
+        .boton-secundario {
+            border-color: var(--line);
+            background: white;
+            color: var(--ink);
+        }
+
+        .boton-secundario:hover { background: #edf3ef; }
+
+        .boton-eliminar {
+            border-color: #e7c7c4;
+            background: white;
+            color: var(--danger);
+        }
+
+        .boton-eliminar:hover { background: #fff3f1; }
+
+        @media (max-width: 640px) {
+            body { padding: 16px 10px; }
+            .contenedor { padding: 18px 12px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <div class="barra-superior">
+            <h1>Clientes</h1>
+            <form th:action="@{/clientes/crear}" method="post">
+                <button class="boton" type="submit">Crear</button>
+            </form>
+        </div>
+        <div class="tabla-contenedor">
+            <div class="fila-clientes cabecera">
+                <div class="celda">Id</div>
+                <div class="celda">Nombre</div>
+                <div class="celda">Apellido1</div>
+                <div class="celda">Apellido2</div>
+                <div class="celda">Ciudad</div>
+                <div class="celda">Categoria</div>
+                <div class="celda">Accion</div>
+            </div>
+            <div th:each="cliente : ${clientes}" class="fila-clientes cliente">
+                <div class="celda" th:text="${cliente.id}"></div>
+                <div class="celda" th:text="${cliente.nombre}"></div>
+                <div class="celda" th:text="${cliente.apellido1}"></div>
+                <div class="celda" th:text="${cliente.apellido2 != null ? cliente.apellido2 : '-'}"></div>
+                <div class="celda" th:text="${cliente.ciudad != null ? cliente.ciudad : '-'}"></div>
+                <div class="celda" th:text="${cliente.categoria}"></div>
+                <div class="celda acciones">
+                    <form th:action="@{/clientes/{id}/editar(id=${cliente.id})}">
+                        <button class="boton boton-secundario" type="submit">Ver detalle</button>
+                    </form>
+                    <form th:action="@{/clientes/borrar/{id}(id=${cliente.id})}" method="post">
+                        <button class="boton boton-eliminar" type="submit">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
