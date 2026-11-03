@@ -1,6 +1,7 @@
 package org.iesvdm.dao;
 
 import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +56,7 @@ public class ClienteDAOImpl implements ClienteDAO {
 			ps.setString(idx++, cliente.getApellido1());
 			ps.setString(idx++, cliente.getApellido2());
 			ps.setString(idx++, cliente.getCiudad());
-			ps.setInt(idx, cliente.getCategoria());
+			ps.setObject(idx, cliente.getCategoria(), Types.INTEGER);
 			return ps;
 		},keyHolder);
 		
@@ -69,22 +70,14 @@ public class ClienteDAOImpl implements ClienteDAO {
 	 */
 	@Override
 	public List<Cliente> getAll() {
-		
-		List<Cliente> listFab = jdbcTemplate.query(
-                "SELECT * FROM cliente",
-                (rs, rowNum) -> new Cliente(rs.getInt("id"),
-                						 	rs.getString("nombre"),
-                						 	rs.getString("apellido1"),
-                						 	rs.getString("apellido2"),
-                						 	rs.getString("ciudad"),
-                						 	rs.getInt("categoría")
-                						 	)
-        );
-		
-		log.info("Devueltos {} registros.", listFab.size());
-		
-        return listFab;
-        
+		List<Cliente> clientes = jdbcTemplate.query(
+				"SELECT * FROM cliente",
+				(rs, rowNum) -> new Cliente(rs.getInt("id"), rs.getString("nombre"),
+						rs.getString("apellido1"), rs.getString("apellido2"),
+						rs.getString("ciudad"), rs.getObject("categoría", Integer.class)));
+
+		log.info("Devueltos {} registros.", clientes.size());
+		return clientes;
 	}
 
 	/**
@@ -95,36 +88,38 @@ public class ClienteDAOImpl implements ClienteDAO {
 		List<Cliente> clientes = jdbcTemplate.query("SELECT * FROM cliente WHERE id = ?",
 				(rs, rowNum) -> new Cliente(rs.getInt("id"), rs.getString("nombre"),
 						rs.getString("apellido1"), rs.getString("apellido2"),
-						rs.getString("ciudad"), rs.getInt("categoría")),
+						rs.getString("ciudad"), rs.getObject("categoría", Integer.class)),
 				id);
 
 		if (clientes.isEmpty()) {
 			log.info("Cliente no encontrado.");
 		}
 		return clientes.stream().findFirst();
-        
 	}
 	/**
 	 * Actualiza Cliente con campos del bean Cliente según ID del mismo.
 	 */
 	@Override
 	public void update(Cliente cliente) {
-		
-		int rows = jdbcTemplate.update("""
-										UPDATE cliente SET 
-														nombre = ?, 
-														apellido1 = ?, 
-														apellido2 = ?,
-														ciudad = ?,
-														categoría = ?  
-												WHERE id = ?
-										""", cliente.getNombre()
-										, cliente.getApellido1()
-										, cliente.getApellido2()
-										, cliente.getCiudad()
-										, cliente.getCategoria()
-										, cliente.getId());
-		
+		int rows = jdbcTemplate.update(connection -> {
+			PreparedStatement statement = connection.prepareStatement("""
+					UPDATE cliente SET
+						nombre = ?,
+						apellido1 = ?,
+						apellido2 = ?,
+						ciudad = ?,
+						categoría = ?
+					WHERE id = ?
+					""");
+			statement.setString(1, cliente.getNombre());
+			statement.setString(2, cliente.getApellido1());
+			statement.setString(3, cliente.getApellido2());
+			statement.setString(4, cliente.getCiudad());
+			statement.setObject(5, cliente.getCategoria(), Types.INTEGER);
+			statement.setInt(6, cliente.getId());
+			return statement;
+		});
+
 		log.info("Update de Cliente con {} registros actualizados.", rows);
     
 	}

@@ -2,9 +2,11 @@ package org.iesvdm.modelo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @SuppressWarnings ("unused")
 public class Cliente {
     private int id;
@@ -12,5 +14,5 @@ public class Cliente {
 	private String apellido1;
 	private String apellido2;
 	private String ciudad;
-	private int categoria;
+	private Integer categoria;
 }

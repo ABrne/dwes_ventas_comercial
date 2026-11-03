@@ -1,6 +1,7 @@
 package org.iesvdm.dao;
 
 import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class ComercialDAOImpl implements ComercialDAO {
 			statement.setString(1, comercial.getNombre());
 			statement.setString(2, comercial.getApellido1());
 			statement.setString(3, comercial.getApellido2());
-			statement.setFloat(4, comercial.getComision());
+			statement.setObject(4, comercial.getComision(), Types.FLOAT);
 			return statement;
 		}, keyHolder);
 
@@ -42,7 +43,7 @@ public class ComercialDAOImpl implements ComercialDAO {
 		List<Comercial> comerciales = jdbcTemplate.query(
 				"SELECT * FROM comercial",
 				(rs, rowNum) -> new Comercial(rs.getInt("id"), rs.getString("nombre"),
-						rs.getString("apellido1"), rs.getString("apellido2"), rs.getFloat("comisión")));
+						 rs.getString("apellido1"), rs.getString("apellido2"), rs.getObject("comisión", Float.class)));
 
 		log.info("Devueltos {} registros de Comercial.", comerciales.size());
 		return comerciales;
@@ -53,17 +54,23 @@ public class ComercialDAOImpl implements ComercialDAO {
 		List<Comercial> comerciales = jdbcTemplate.query(
 				"SELECT * FROM comercial WHERE id = ?",
 				(rs, rowNum) -> new Comercial(rs.getInt("id"), rs.getString("nombre"),
-						rs.getString("apellido1"), rs.getString("apellido2"), rs.getFloat("comisión")),
+						 rs.getString("apellido1"), rs.getString("apellido2"), rs.getObject("comisión", Float.class)),
 				id);
 		return comerciales.stream().findFirst();
 	}
 
 	@Override
 	public void update(Comercial comercial) {
-		int rows = jdbcTemplate.update(
-				"UPDATE comercial SET nombre = ?, apellido1 = ?, apellido2 = ?, comisión = ? WHERE id = ?",
-				comercial.getNombre(), comercial.getApellido1(), comercial.getApellido2(),
-				comercial.getComision(), comercial.getId());
+		int rows = jdbcTemplate.update(connection -> {
+			PreparedStatement statement = connection.prepareStatement(
+					"UPDATE comercial SET nombre = ?, apellido1 = ?, apellido2 = ?, comisión = ? WHERE id = ?");
+			statement.setString(1, comercial.getNombre());
+			statement.setString(2, comercial.getApellido1());
+			statement.setString(3, comercial.getApellido2());
+			statement.setObject(4, comercial.getComision(), Types.FLOAT);
+			statement.setInt(5, comercial.getId());
+			return statement;
+		});
 		log.info("Update de Comercial con {} registros actualizados.", rows);
 	}
 

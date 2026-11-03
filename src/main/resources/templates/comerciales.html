@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Comerciales | Ventas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>body { background: #f3f6f4; } .registro:hover { background: #f7faf8; }</style>
+</head>
+<body>
+<main class="container py-4">
+    <header class="row align-items-center g-3 mb-4">
+        <div class="col-12 col-md-6"><h1 class="h2 mb-0">Comerciales</h1></div>
+        <nav class="col-12 col-md-6 d-flex flex-wrap justify-content-md-end gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/clientes}">Clientes</a>
+            <a class="btn btn-primary" th:href="@{/comerciales/crear}">Nuevo comercial</a>
+        </nav>
+    </header>
+
+    <div th:if="${mensaje}" class="alert alert-success" role="status" th:text="${mensaje}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <section aria-label="Listado de comerciales">
+        <div class="row g-0 border-bottom border-2 pb-2 mb-1 text-secondary small fw-semibold text-uppercase d-none d-md-flex">
+            <div class="col-md-1 px-2">Id</div>
+            <div class="col-md-2 px-2">Nombre</div>
+            <div class="col-md-2 px-2">Primer apellido</div>
+            <div class="col-md-2 px-2">Segundo apellido</div>
+            <div class="col-md-2 px-2">Comisión</div>
+            <div class="col-md-3 px-2">Acciones</div>
+        </div>
+        <article class="row g-0 align-items-center border-bottom py-2 registro" th:each="comercial : ${comerciales}">
+            <div class="col-2 col-md-1 px-2"><span class="d-md-none small text-secondary">Id<br></span><span th:text="${comercial.id}"></span></div>
+            <div class="col-5 col-md-2 px-2 text-break"><span class="d-md-none small text-secondary">Nombre<br></span><span th:text="${comercial.nombre}"></span></div>
+            <div class="col-5 col-md-2 px-2 text-break"><span class="d-md-none small text-secondary">Primer apellido<br></span><span th:text="${comercial.apellido1}"></span></div>
+            <div class="col-6 col-md-2 px-2 text-break"><span class="d-md-none small text-secondary">Segundo apellido<br></span><span th:text="${comercial.apellido2 != null ? comercial.apellido2 : '-'}"></span></div>
+            <div class="col-6 col-md-2 px-2"><span class="d-md-none small text-secondary">Comisión<br></span><span th:text="${comercial.comision != null ? comercial.comision : '-'}"></span></div>
+            <div class="col-12 col-md-3 px-2 d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                <a class="btn btn-sm btn-outline-secondary" th:href="@{/comerciales/{id}(id=${comercial.id})}">Detalle</a>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/comerciales/editar/{id}(id=${comercial.id})}">Editar</a>
+                <form th:action="@{/comerciales/borrar/{id}(id=${comercial.id})}" method="post">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+                </form>
+            </div>
+        </article>
+        <div th:if="${#lists.isEmpty(comerciales)}" class="py-4 text-secondary">No hay comerciales registrados.</div>
+    </section>
+</main>
+</body>
+</html>
