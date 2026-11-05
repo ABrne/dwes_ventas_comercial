@@ -12,35 +12,37 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+@RequestMapping("/comerciales")
 @Controller
 public class ComercialController {
 
 	@Autowired
 	private ComercialService comercialService;
 
-	@GetMapping("/comerciales")
+	@GetMapping
 	public String listar(Model model) {
 		List<Comercial> comerciales = comercialService.getAllComerciales();
 		model.addAttribute("comerciales", comerciales);
 		return "comerciales";
 	}
 
-	@GetMapping("/comerciales/crear")
+	@GetMapping("/crear")
 	public String crear(Model model) {
 		model.addAttribute("comercial", new Comercial());
 		return "crear-comercial";
 	}
 
-	@PostMapping("/comerciales/crear")
+	@PostMapping("/crear")
 	public String submitCrear(@ModelAttribute("comercial") Comercial comercial, RedirectAttributes attributes) {
 		comercialService.createComercial(comercial);
 		attributes.addFlashAttribute("mensaje", "Comercial creado correctamente.");
 		return "redirect:/comerciales";
 	}
 
-	@GetMapping("/comerciales/{id}")
+	@GetMapping("/{id}")
 	public String detalle(@PathVariable int id, Model model, RedirectAttributes attributes) {
 		return comercialService.findComercial(id)
 				.map(comercial -> {
@@ -53,7 +55,7 @@ public class ComercialController {
 				});
 	}
 
-	@GetMapping("/comerciales/editar/{id}")
+	@GetMapping("/editar/{id}")
 	public String editar(@PathVariable int id, Model model, RedirectAttributes attributes) {
 		return comercialService.findComercial(id)
 				.map(comercial -> {
@@ -66,7 +68,7 @@ public class ComercialController {
 				});
 	}
 
-	@PostMapping("/comerciales/editar/{id}")
+	@PostMapping("/editar/{id}")
 	public String submitEditar(@PathVariable int id, @ModelAttribute("comercial") Comercial comercial,
 			RedirectAttributes attributes) {
 		comercial.setId(id);
@@ -75,7 +77,7 @@ public class ComercialController {
 		return "redirect:/comerciales";
 	}
 
-	@PostMapping("/comerciales/borrar/{id}")
+	@PostMapping("/borrar/{id}")
 	public String borrar(@PathVariable int id, RedirectAttributes attributes) {
 		try {
 			comercialService.deleteComercial(id);

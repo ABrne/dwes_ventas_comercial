@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data 
 @AllArgsConstructor 
 @NoArgsConstructor
-@SuppressWarnings ("unused")
 public class Comercial {
     private int id;
 	private String nombre;
